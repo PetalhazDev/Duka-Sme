@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duka — Run Your Lagos Business Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1C1B1A;
+  --paper:#FAF7F1;
+  --paper-dim:#F1ECE2;
+  --forest:#1E4D40;
+  --forest-dark:#163933;
+  --amber:#E3962B;
+  --terracotta:#C1502E;
+  --line:rgba(28,27,26,.12);
+  --line-strong:rgba(28,27,26,.22);
+  --radius:10px;
+  --shadow:0 14px 34px rgba(28,27,26,.12);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Fraunces',serif; font-weight:700; letter-spacing:-0.01em;}
+.mono{font-family:'JetBrains Mono',monospace;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+a{color:inherit; text-decoration:none;}
+
+/* ===== APP SHELL ===== */
+.app{ display:grid; grid-template-columns:240px 1fr; min-height:100vh;}
+.sidebar{
+  background:var(--forest); color:#fff; display:flex; flex-direction:column; padding:26px 0;
+  position:sticky; top:0; height:100vh;
+}
+.brand{ display:flex; align-items:center; gap:10px; padding:0 22px 26px; border-bottom:1px solid rgba(255,255,255,.14); margin-bottom:18px;}
+.brand .mark{ width:30px; height:30px; border-radius:7px; background:var(--amber); display:flex; align-items:center; justify-content:center; font-family:'Fraunces'; font-weight:700; color:var(--forest-dark); font-size:1rem;}
+.brand span.name{ font-family:'Fraunces'; font-size:1.25rem; font-weight:700;}
+.side-nav{ display:flex; flex-direction:column; gap:2px; padding:0 12px;}
+.side-link{
+  display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:8px; color:rgba(255,255,255,.78);
+  font-size:.88rem; font-weight:600; background:none; border:none; text-align:left; width:100%;
+}
+.side-link .ic{ font-size:1.05rem; width:20px; text-align:center;}
+.side-link.active{ background:rgba(255,255,255,.12); color:#fff;}
+.side-link:hover{ color:#fff;}
+.side-foot{ margin-top:auto; padding:16px 22px 0 22px; border-top:1px solid rgba(255,255,255,.14); font-size:.74rem; opacity:.65;}
+.tier-pill{ display:inline-block; background:var(--amber); color:var(--forest-dark); font-weight:700; font-size:.68rem; padding:3px 9px; border-radius:999px; margin-top:6px;}
+
+.main{ padding:34px 40px 60px; max-width:1100px;}
+.view{ display:none; }
+.view.active{ display:block; animation:fade .2s ease;}
+@keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+.page-head{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; gap:20px; flex-wrap:wrap;}
+.page-head .eyebrow{ font-family:'JetBrains Mono'; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--terracotta); display:block; margin-bottom:6px;}
+.page-head h1{ font-size:1.9rem; margin:0;}
+.page-head p.sub{ margin:6px 0 0; opacity:.65; font-size:.92rem; max-width:520px;}
+
+.btn{ border:none; border-radius:8px; padding:11px 20px; font-weight:700; font-size:.86rem; display:inline-flex; align-items:center; gap:8px;}
+.btn-primary{ background:var(--forest); color:#fff;}
+.btn-primary:hover{ background:var(--forest-dark);}
+.btn-amber{ background:var(--amber); color:var(--forest-dark);}
+.btn-ghost{ background:transparent; border:1.5px solid var(--line-strong); color:var(--ink);}
+.btn-danger{ background:transparent; border:1.5px solid var(--terracotta); color:var(--terracotta); padding:7px 12px; font-size:.76rem;}
+.btn-sm{ padding:7px 14px; font-size:.78rem;}
+
+/* ===== CARDS / STATS ===== */
+.stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px;}
+.stat-card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px;}
+.stat-card .label{ font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; opacity:.55; font-weight:700;}
+.stat-card .value{ font-family:'Fraunces'; font-size:1.7rem; margin-top:6px;}
+.stat-card .delta{ font-size:.74rem; color:var(--forest); font-weight:700; margin-top:4px;}
+
+.panel{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:24px; margin-bottom:24px;}
+.panel h2{ font-size:1.15rem; margin:0 0 4px;}
+.panel .panel-sub{ font-size:.82rem; opacity:.6; margin:0 0 18px;}
+
+/* ===== LEDGER BAR CHART (signature) ===== */
+.ledger{ border:1px solid var(--line); border-radius:var(--radius); background:repeating-linear-gradient(180deg, transparent 0 39px, var(--line) 39px 40px); padding:0; overflow:hidden;}
+.ledger-row{ display:grid; grid-template-columns:120px 1fr 100px; align-items:center; gap:14px; padding:10px 18px; min-height:40px;}
+.ledger-row .bar-track{ background:var(--paper-dim); border-radius:5px; height:14px; overflow:hidden;}
+.ledger-row .bar-fill{ height:100%; background:var(--forest); border-radius:5px;}
+.ledger-row .amt{ text-align:right; font-size:.82rem;}
+
+/* ===== FORMS ===== */
+.field{ margin-bottom:16px;}
+.field label{ display:block; font-size:.78rem; font-weight:700; margin-bottom:6px; opacity:.7;}
+.field input, .field select, .field textarea{
+  width:100%; padding:10px 12px; border:1.5px solid var(--line-strong); border-radius:7px; font-size:.88rem; background:#fff; color:var(--ink);
+}
+.field textarea{ resize:vertical; min-height:70px;}
+.field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.emoji-pick{ display:flex; gap:8px; flex-wrap:wrap;}
+.emoji-pick button{ font-size:1.3rem; width:42px; height:42px; border-radius:8px; border:1.5px solid var(--line); background:#fff;}
+.emoji-pick button.selected{ border-color:var(--amber); background:#fff6e9;}
+
+/* ===== STOREFRONT PREVIEW ===== */
+.store-preview{ border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff;}
+.store-hero{ padding:30px; color:#fff; background:var(--forest);}
+.store-hero .slogo{ width:54px; height:54px; border-radius:12px; background:var(--amber); display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin-bottom:12px;}
+.store-hero h2{ margin:0 0 4px; font-size:1.5rem; color:#fff;}
+.store-hero p{ margin:0; opacity:.85; font-size:.88rem;}
+.store-badges{ display:flex; gap:8px; margin-top:14px;}
+.store-badge{ background:rgba(255,255,255,.15); font-size:.7rem; padding:4px 10px; border-radius:999px; font-weight:700;}
+.store-products{ padding:24px; display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px;}
+.sp-card{ border:1px solid var(--line); border-radius:9px; padding:12px; text-align:center;}
+.sp-card .ico{ font-size:2rem; margin-bottom:6px;}
+.sp-card .nm{ font-weight:700; font-size:.82rem; margin-bottom:3px;}
+.sp-card .pr{ font-family:'JetBrains Mono'; color:var(--forest); font-weight:700; font-size:.86rem;}
+.sp-card .stock{ font-size:.68rem; opacity:.5; margin-top:3px;}
+.store-cta{ padding:18px 24px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;}
+
+/* ===== TABLES ===== */
+table{ width:100%; border-collapse:collapse; font-size:.86rem;}
+th{ text-align:left; padding:10px 8px; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; opacity:.55; border-bottom:1.5px solid var(--line-strong);}
+td{ padding:11px 8px; border-bottom:1px solid var(--line);}
+tr:last-child td{ border-bottom:none;}
+.tag{ display:inline-block; font-size:.68rem; font-weight:700; padding:3px 9px; border-radius:999px;}
+.tag-green{ background:#e4f1ec; color:var(--forest);}
+.tag-amber{ background:#fbecd4; color:#8a5a14;}
+.tag-grey{ background:#eee; color:#777;}
+
+.empty-state{ text-align:center; padding:50px 20px; opacity:.55; font-size:.9rem;}
+
+/* ===== INQUIRIES ===== */
+.inquiry{ border:1px solid var(--line); border-radius:9px; padding:14px 16px; margin-bottom:10px; display:flex; justify-content:space-between; gap:14px; align-items:flex-start;}
+.inquiry .iq-name{ font-weight:700; font-size:.88rem;}
+.inquiry .iq-msg{ font-size:.83rem; opacity:.75; margin-top:3px;}
+.inquiry .iq-meta{ font-size:.7rem; opacity:.5; margin-top:5px;}
+
+/* ===== INVOICE ===== */
+.invoice-paper{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:36px; max-width:560px; box-shadow:var(--shadow);}
+.invoice-paper .inv-head{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:18px;}
+.invoice-paper .inv-head h2{ margin:0; font-size:1.3rem;}
+.invoice-paper .inv-no{ font-family:'JetBrains Mono'; font-size:.8rem; opacity:.6;}
+.invoice-paper table{ margin-bottom:14px;}
+.invoice-paper .inv-total{ display:flex; justify-content:flex-end; font-family:'Fraunces'; font-size:1.3rem; border-top:2px solid var(--ink); padding-top:12px;}
+.invoice-meta{ display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:.82rem; margin-bottom:16px; opacity:.8;}
+
+/* ===== PLANS ===== */
+.plans-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.plan-card{ border:1.5px solid var(--line); border-radius:12px; padding:24px; position:relative;}
+.plan-card.featured{ border-color:var(--amber); box-shadow:0 0 0 3px rgba(227,150,43,.15);}
+.plan-card .pname{ font-family:'Fraunces'; font-size:1.2rem; margin-bottom:4px;}
+.plan-card .pprice{ font-family:'JetBrains Mono'; font-size:1.6rem; font-weight:700; color:var(--forest); margin-bottom:14px;}
+.plan-card .pprice span{ font-size:.78rem; opacity:.55; font-family:'Inter'; font-weight:600;}
+.plan-card ul{ list-style:none; padding:0; margin:0 0 18px; font-size:.84rem; display:flex; flex-direction:column; gap:9px;}
+.plan-card li::before{ content:'✓ '; color:var(--forest); font-weight:700;}
+.current-tag{ position:absolute; top:-12px; right:18px; background:var(--forest); color:#fff; font-size:.68rem; padding:4px 10px; border-radius:999px; font-weight:700;}
+
+.ad-slot{ border:2px dashed var(--line-strong); border-radius:10px; padding:24px; text-align:center; color:var(--ink); opacity:.6; font-size:.85rem; margin-top:10px;}
+
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff;
+  padding:12px 22px; border-radius:999px; font-size:.85rem; font-weight:600; opacity:0; transition:all .25s ease; z-index:400; pointer-events:none;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0);}
+
+footer.app-foot{ text-align:center; padding:30px 0 10px; font-size:.78rem; opacity:.55;}
+footer.app-foot b{ color:var(--terracotta);}
+
+@media (max-width:880px){
+  .app{ grid-template-columns:1fr;}
+  .sidebar{ position:relative; height:auto; flex-direction:row; overflow-x:auto; padding:14px;}
+  .brand{ display:none;}
+  .side-nav{ flex-direction:row; padding:0;}
+  .side-foot{ display:none;}
+  .main{ padding:24px 18px;}
+  .stat-row{ grid-template-columns:1fr 1fr;}
+  .plans-grid{ grid-template-columns:1fr;}
+  .field-row{ grid-template-columns:1fr;}
+  .ledger-row{ grid-template-columns:90px 1fr 70px;}
+  .invoice-meta{ grid-template-columns:1fr;}
+}
+:focus-visible{ outline:3px solid var(--amber); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark">D</span><span class="name">Duka</span></div>
+    <nav class="side-nav" id="sideNav">
+      <button class="side-link active" data-view="dashboard"><span class="ic">◧</span> Dashboard</button>
+      <button class="side-link" data-view="store"><span class="ic">🏬</span> My Store</button>
+      <button class="side-link" data-view="products"><span class="ic">📦</span> Products</button>
+      <button class="side-link" data-view="sales"><span class="ic">📈</span> Sales</button>
+      <button class="side-link" data-view="inquiries"><span class="ic">💬</span> Inquiries</button>
+      <button class="side-link" data-view="invoices"><span class="ic">🧾</span> Invoices</button>
+      <button class="side-link" data-view="plans"><span class="ic">⭐</span> Plans &amp; Ads</button>
+    </nav>
+    <div class="side-foot">
+      Logged in as<br><b id="sideBizName" style="color:#fff;">Your Business</b>
+      <div class="tier-pill" id="sideTier">FREE PLAN</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-head">
+        <div><span class="eyebrow">Overview</span><h1>Good day, <span id="dashName">Boss</span> 👋</h1><p class="sub">Here's how your business is doing online today.</p></div>
+        <button class="btn btn-primary" onclick="go('store')">Edit my store</button>
+      </div>
+      <div class="stat-row" id="statRow"></div>
+      <div class="panel">
+        <h2>Sales this week</h2>
+        <p class="panel-sub">A running ledger of what's coming in — log a sale from the Sales tab.</p>
+        <div class="ledger" id="ledgerChart"></div>
+      </div>
+      <div class="panel">
+        <h2>Latest inquiries</h2>
+        <p class="panel-sub">Customers asking about your products.</p>
+        <div id="dashInquiries"></div>
+      </div>
+    </section>
+
+    <!-- STORE BUILDER -->
+    <section class="view" id="view-store">
+      <div class="page-head">
+        <div><span class="eyebrow">Storefront</span><h1>Build your online store</h1><p class="sub">This becomes the page customers see when you share your Duka link instead of just a WhatsApp number.</p></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <div class="panel">
+          <h2>Business details</h2>
+          <div class="field"><label>Business name</label><input id="bizName" placeholder="e.g. Ola's Kitchen Essentials"></div>
+          <div class="field"><label>Tagline</label><input id="bizTagline" placeholder="e.g. Quality kitchenware, fair prices"></div>
+          <div class="field-row">
+            <div class="field"><label>Category</label>
+              <select id="bizCategory">
+                <option>Fashion &amp; Accessories</option>
+                <option>Food &amp; Groceries</option>
+                <option>Electronics</option>
+                <option>Beauty &amp; Personal Care</option>
+                <option>Home &amp; Kitchen</option>
+                <option>Services</option>
+              </select>
+            </div>
+            <div class="field"><label>WhatsApp number</label><input id="bizWhatsapp" placeholder="080..."></div>
+          </div>
+          <div class="field"><label>Pick a store icon</label>
+            <div class="emoji-pick" id="emojiPick"></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveStore()">Save store</button>
+        </div>
+        <div>
+          <h2 style="font-size:1rem; opacity:.6; margin-bottom:10px;">Live preview</h2>
+          <div class="store-preview" id="storePreview"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="view" id="view-products">
+      <div class="page-head">
+        <div><span class="eyebrow">Catalog</span><h1>Products</h1><p class="sub">Everything you list here shows up on your storefront automatically.</p></div>
+        <button class="btn btn-amber" onclick="openProductForm()">+ Add product</button>
+      </div>
+      <div class="panel" id="productFormPanel" style="display:none;">
+        <h2>New product</h2>
+        <div class="field-row">
+          <div class="field"><label>Product name</label><input id="pName" placeholder="e.g. Ankara Apron"></div>
+          <div class="field"><label>Price (₦)</label><input id="pPrice" type="number" placeholder="5000"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Stock quantity</label><input id="pStock" type="number" placeholder="20"></div>
+          <div class="field"><label>Icon</label><input id="pIcon" placeholder="emoji e.g. 🧁" maxlength="2"></div>
+        </div>
+        <div class="field"><label>Description</label><textarea id="pDesc" placeholder="Short description customers will see"></textarea></div>
+        <button class="btn btn-primary" onclick="addProduct()">Save product</button>
+        <button class="btn btn-ghost" onclick="closeProductForm()">Cancel</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+          <tbody id="productTable"></tbody>
+        </table>
+        <div class="empty-state" id="productEmpty" style="display:none;">No products yet. Add your first one above.</div>
+      </div>
+    </section>
+
+    <!-- SALES -->
+    <section class="view" id="view-sales">
+      <div class="page-head">
+        <div><span class="eyebrow">Revenue</span><h1>Sales tracker</h1><p class="sub">Log every sale — walk-in or online — to keep one true record of your revenue.</p></div>
+        <button class="btn btn-amber" onclick="openSaleForm()">+ Log a sale</button>
+      </div>
+      <div class="panel" id="saleFormPanel" style="display:none;">
+        <h2>Log a sale</h2>
+        <div class="field-row">
+          <div class="field"><label>Product</label><select id="sProduct"></select></div>
+          <div class="field"><label>Quantity</label><input id="sQty" type="number" value="1" min="1"></div>
+        </div>
+        <div class="field"><label>Customer name (optional)</label><input id="sCustomer" placeholder="e.g. Tunde A."></div>
+        <button class="btn btn-primary" onclick="logSale()">Save sale</button>
+        <button class="btn btn-ghost" onclick="closeSaleForm()">Cancel</button>
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Date</th><th>Product</th><th>Customer</th><th>Qty</th><th>Amount</th><th></th></tr></thead>
+          <tbody id="salesTable"></tbody>
+        </table>
+        <div class="empty-state" id="salesEmpty" style="display:none;">No sales logged yet.</div>
+      </div>
+    </section>
+
+    <!-- INQUIRIES -->
+    <section class="view" id="view-inquiries">
+      <div class="page-head">
+        <div><span class="eyebrow">Inbox</span><h1>Customer inquiries</h1><p class="sub">Messages from people who found your store through Duka.</p></div>
+        <button class="btn btn-ghost" onclick="simulateInquiry()">Simulate new inquiry</button>
+      </div>
+      <div class="panel"><div id="inquiriesList"></div></div>
+    </section>
+
+    <!-- INVOICES -->
+    <section class="view" id="view-invoices">
+      <div class="page-head">
+        <div><span class="eyebrow">Billing</span><h1>Invoices</h1><p class="sub">Turn any sale into a proper invoice you can send to a customer.</p></div>
+        <button class="btn btn-amber" onclick="openInvoiceForm()">+ New invoice</button>
+      </div>
+      <div class="panel" id="invoiceFormPanel" style="display:none;">
+        <h2>Create invoice</h2>
+        <div class="field"><label>Customer name</label><input id="invCustomer" placeholder="e.g. Chidinma Okafor"></div>
+        <div class="field-row">
+          <div class="field"><label>Product / description</label><input id="invItem" placeholder="e.g. 2 Ankara Aprons"></div>
+          <div class="field"><label>Amount (₦)</label><input id="invAmount" type="number" placeholder="10000"></div>
+        </div>
+        <button class="btn btn-primary" onclick="createInvoice()">Generate invoice</button>
+        <button class="btn btn-ghost" onclick="closeInvoiceForm()">Cancel</button>
+      </div>
+      <div id="invoiceListWrap" class="panel">
+        <table>
+          <thead><tr><th>Invoice #</th><th>Customer</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+          <tbody id="invoiceTable"></tbody>
+        </table>
+        <div class="empty-state" id="invoiceEmpty" style="display:none;">No invoices yet.</div>
+      </div>
+      <div id="invoicePreviewWrap"></div>
+    </section>
+
+    <!-- PLANS & ADS -->
+    <section class="view" id="view-plans">
+      <div class="page-head">
+        <div><span class="eyebrow">Grow your reach</span><h1>Plans &amp; advertising</h1><p class="sub">How Duka makes money — and how that buys your business more visibility.</p></div>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card" id="planFree">
+          <div class="pname">Free</div>
+          <div class="pprice">₦0 <span>/month</span></div>
+          <ul>
+            <li>Storefront page</li>
+            <li>Up to 10 products</li>
+            <li>Basic sales tracker</li>
+            <li>Standard search ranking</li>
+          </ul>
+          <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="setPlan('Free')">Choose Free</button>
+        </div>
+        <div class="plan-card featured" id="planPro">
+          <div class="pname">Pro</div>
+          <div class="pprice">₦5,000 <span>/month</span></div>
+          <ul>
+            <li>Unlimited products</li>
+            <li>Invoicing &amp; sales reports</li>
+            <li>Priority placement in category search</li>
+            <li>"Verified business" badge</li>
+          </ul>
+          <button class="btn btn-amber" style="width:100%; justify-content:center;" onclick="setPlan('Pro')">Choose Pro</button>
+        </div>
+        <div class="plan-card" id="planPremium">
+          <div class="pname">Premium Listing</div>
+          <div class="pprice">₦15,000 <span>/month</span></div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Featured on homepage &amp; category top</li>
+            <li>Run banner ads to other Duka shoppers</li>
+            <li>Monthly performance report</li>
+          </ul>
+          <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="setPlan('Premium')">Choose Premium</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:24px;">
+        <h2>Advertising slot preview</h2>
+        <p class="panel-sub">If you're on Premium Listing, this is roughly where your ad would appear to shoppers browsing your category.</p>
+        <div class="ad-slot" id="adSlot">Upgrade to Premium Listing to activate your ad slot here.</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="app-foot">Designed with love by <b>Babatunde Peter</b> — a frontend demo. Sales, invoices and inquiries are sample data stored only in this browser.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== STATE ===================== */
+let store = JSON.parse(localStorage.getItem('duka_store') || 'null') || {
+  name:'', tagline:'', category:'Fashion & Accessories', whatsapp:'', icon:'🏬', plan:'Free'
+};
+let products = JSON.parse(localStorage.getItem('duka_products') || '[]');
+let sales = JSON.parse(localStorage.getItem('duka_sales') || '[]');
+let inquiries = JSON.parse(localStorage.getItem('duka_inquiries') || '[]');
+let invoices = JSON.parse(localStorage.getItem('duka_invoices') || '[]');
+
+const ICONS = ['🏬','🛍️','🍲','💄','📱','🪑','👗','🧁'];
+
+function persist(){
+  localStorage.setItem('duka_store', JSON.stringify(store));
+  localStorage.setItem('duka_products', JSON.stringify(products));
+  localStorage.setItem('duka_sales', JSON.stringify(sales));
+  localStorage.setItem('duka_inquiries', JSON.stringify(inquiries));
+  localStorage.setItem('duka_invoices', JSON.stringify(invoices));
+}
+function fmt(n){ return '₦' + Number(n||0).toLocaleString('en-NG'); }
+function showToast(msg){
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt); window._tt = setTimeout(()=>t.classList.remove('show'), 2300);
+}
+
+/* seed sample data on very first run so the dashboard isn't empty */
+if(!localStorage.getItem('duka_seeded')){
+  store = {name:"Ola's Kitchen Essentials", tagline:'Quality kitchenware, fair prices', category:'Home & Kitchen', whatsapp:'08012345678', icon:'🍲', plan:'Free'};
+  products = [
+    {id:'p1', name:'Non-stick Frying Pan', price:8500, stock:14, icon:'🍳', desc:'28cm non-stick pan, induction friendly.'},
+    {id:'p2', name:'Ankara Print Apron', price:4500, stock:22, icon:'👗', desc:'Adjustable, one size fits most.'},
+    {id:'p3', name:'Set of 6 Storage Jars', price:9000, stock:8, icon:'🫙', desc:'Airtight glass jars for spices and grains.'}
+  ];
+  sales = [
+    {id:'s1', pid:'p1', name:'Non-stick Frying Pan', qty:2, amount:17000, customer:'Funke A.', date:daysAgo(1)},
+    {id:'s2', pid:'p2', name:'Ankara Print Apron', qty:1, amount:4500, customer:'Walk-in', date:daysAgo(2)},
+    {id:'s3', pid:'p3', name:'Set of 6 Storage Jars', qty:3, amount:27000, customer:'Chika O.', date:daysAgo(4)},
+  ];
+  inquiries = [
+    {id:'i1', name:'Tunde B.', msg:'Do you deliver to Yaba? I want the storage jars.', date:daysAgo(0), replied:false},
+    {id:'i2', name:'Amaka N.', msg:'Is the frying pan available in a bigger size?', date:daysAgo(1), replied:true},
+  ];
+  invoices = [];
+  localStorage.setItem('duka_seeded','1');
+  persist();
+}
+function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toLocaleDateString('en-NG'); }
+
+/* ===================== NAV ===================== */
+document.getElementById('sideNav').addEventListener('click', e=>{
+  const btn = e.target.closest('.side-link'); if(!btn) return;
+  go(btn.dataset.view);
+});
+function go(view){
+  document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id==='view-'+view));
+  if(view==='dashboard') renderDashboard();
+  if(view==='store') renderStoreView();
+  if(view==='products') renderProducts();
+  if(view==='sales') renderSales();
+  if(view==='inquiries') renderInquiries();
+  if(view==='invoices') renderInvoices();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===================== DASHBOARD ===================== */
+function renderDashboard(){
+  document.getElementById('dashName').textContent = store.name ? store.name.split(' ')[0] : 'Boss';
+  document.getElementById('sideBizName').textContent = store.name || 'Your Business';
+  document.getElementById('sideTier').textContent = store.plan.toUpperCase() + ' PLAN';
+
+  const totalRevenue = sales.reduce((s,x)=>s+x.amount,0);
+  const totalOrders = sales.length;
+  const unreplied = inquiries.filter(i=>!i.replied).length;
+
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat-card"><div class="label">Total revenue</div><div class="value">${fmt(totalRevenue)}</div><div class="delta">${totalOrders} sales logged</div></div>
+    <div class="stat-card"><div class="label">Products listed</div><div class="value">${products.length}</div><div class="delta">${products.filter(p=>p.stock<5).length} low on stock</div></div>
+    <div class="stat-card"><div class="label">Open inquiries</div><div class="value">${unreplied}</div><div class="delta">${inquiries.length} total received</div></div>
+    <div class="stat-card"><div class="label">Current plan</div><div class="value" style="font-size:1.3rem;">${store.plan}</div><div class="delta">${store.plan==='Free'?'Upgrade for more reach':'Active'}</div></div>
+  `;
+
+  const max = Math.max(1, ...sales.map(s=>s.amount));
+  const chart = document.getElementById('ledgerChart');
+  chart.innerHTML = sales.length ? sales.slice(0,6).map(s=>`
+    <div class="ledger-row">
+      <div class="mono" style="font-size:.74rem; opacity:.6;">${s.date}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(s.amount/max*100).toFixed(0)}%"></div></div>
+      <div class="amt mono">${fmt(s.amount)}</div>
+    </div>
+  `).join('') : `<div class="empty-state">No sales yet — log one from the Sales tab.</div>`;
+
+  const dq = document.getElementById('dashInquiries');
+  dq.innerHTML = inquiries.length ? inquiries.slice(0,3).map(i=>`
+    <div class="inquiry"><div><div class="iq-name">${i.name}</div><div class="iq-msg">${i.msg}</div></div>
+      <span class="tag ${i.replied?'tag-green':'tag-amber'}">${i.replied?'Replied':'New'}</span></div>
+  `).join('') : `<div class="empty-state">No inquiries yet.</div>`;
+}
+
+/* ===================== STORE BUILDER ===================== */
+function renderStoreView(){
+  document.getElementById('bizName').value = store.name;
+  document.getElementById('bizTagline').value = store.tagline;
+  document.getElementById('bizCategory').value = store.category;
+  document.getElementById('bizWhatsapp').value = store.whatsapp;
+  const pick = document.getElementById('emojiPick');
+  pick.innerHTML = ICONS.map(ic=>`<button type="button" class="${ic===store.icon?'selected':''}" data-ic="${ic}">${ic}</button>`).join('');
+  pick.querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{ store.icon = b.dataset.ic; pick.querySelectorAll('button').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); renderPreview(); };
+  });
+  renderPreview();
+}
+function renderPreview(){
+  const name = document.getElementById('bizName').value || 'Your Business Name';
+  const tagline = document.getElementById('bizTagline').value || 'Your tagline goes here';
+  const wa = document.getElementById('bizWhatsapp').value || store.whatsapp;
+  document.getElementById('storePreview').innerHTML = `
+    <div class="store-hero">
+      <div class="slogo">${store.icon}</div>
+      <h2>${name}</h2>
+      <p>${tagline}</p>
+      <div class="store-badges"><span class="store-badge">${store.category}</span>${store.plan!=='Free'?`<span class="store-badge">★ ${store.plan}</span>`:''}</div>
+    </div>
+    <div class="store-products">
+      ${products.length ? products.map(p=>`
+        <div class="sp-card"><div class="ico">${p.icon}</div><div class="nm">${p.name}</div><div class="pr">${fmt(p.price)}</div><div class="stock">${p.stock} in stock</div></div>
+      `).join('') : '<div class="empty-state" style="grid-column:1/-1;">Add products to see them here.</div>'}
+    </div>
+    <div class="store-cta"><span style="font-size:.82rem; opacity:.65;">Chat to order</span><span class="mono" style="font-weight:700;">${wa ? '+234 '+wa.replace(/^0/,'') : 'Add WhatsApp number'}</span></div>
+  `;
+}
+['bizName','bizTagline','bizWhatsapp'].forEach(id=>{
+  document.addEventListener('input', e=>{ if(e.target.id===id) renderPreview(); });
+});
+document.addEventListener('change', e=>{ if(e.target.id==='bizCategory') renderPreview(); });
+function saveStore(){
+  store.name = document.getElementById('bizName').value.trim();
+  store.tagline = document.getElementById('bizTagline').value.trim();
+  store.category = document.getElementById('bizCategory').value;
+  store.whatsapp = document.getElementById('bizWhatsapp').value.trim();
+  if(!store.name){ showToast('Give your business a name first'); return; }
+  persist();
+  showToast('Store saved');
+  renderPreview();
+}
+
+/* ===================== PRODUCTS ===================== */
+function openProductForm(){ document.getElementById('productFormPanel').style.display='block'; }
+function closeProductForm(){ document.getElementById('productFormPanel').style.display='none'; }
+function addProduct(){
+  const name = document.getElementById('pName').value.trim();
+  const price = parseFloat(document.getElementById('pPrice').value);
+  const stock = parseInt(document.getElementById('pStock').value)||0;
+  const icon = document.getElementById('pIcon').value.trim() || '📦';
+  const desc = document.getElementById('pDesc').value.trim();
+  if(!name || !price){ showToast('Add at least a name and price'); return; }
+  if(store.plan==='Free' && products.length>=10){ showToast('Free plan allows up to 10 products — upgrade to Pro for unlimited'); return; }
+  products.push({id:'p'+Date.now(), name, price, stock, icon, desc});
+  persist(); renderProducts(); closeProductForm();
+  document.getElementById('pName').value=''; document.getElementById('pPrice').value=''; document.getElementById('pStock').value=''; document.getElementById('pIcon').value=''; document.getElementById('pDesc').value='';
+  showToast('Product added');
+}
+function removeProduct(id){
+  products = products.filter(p=>p.id!==id); persist(); renderProducts();
+}
+function renderProducts(){
+  const tbody = document.getElementById('productTable');
+  document.getElementById('productEmpty').style.display = products.length?'none':'block';
+  tbody.innerHTML = products.map(p=>`
+    <tr>
+      <td>${p.icon} <b>${p.name}</b><div style="font-size:.74rem; opacity:.55;">${p.desc||''}</div></td>
+      <td class="mono">${fmt(p.price)}</td>
+      <td>${p.stock<5 ? `<span class="tag tag-amber">${p.stock} left</span>` : p.stock}</td>
+      <td><button class="btn-danger" onclick="removeProduct('${p.id}')">Remove</button></td>
+    </tr>
+  `).join('');
+}
+
+/* ===================== SALES ===================== */
+function openSaleForm(){
+  const sel = document.getElementById('sProduct');
+  sel.innerHTML = products.map(p=>`<option value="${p.id}">${p.name} — ${fmt(p.price)}</option>`).join('') || '<option value="">No products yet</option>';
+  document.getElementById('saleFormPanel').style.display='block';
+}
+function closeSaleForm(){ document.getElementById('saleFormPanel').style.display='none'; }
+function logSale(){
+  const pid = document.getElementById('sProduct').value;
+  const qty = parseInt(document.getElementById('sQty').value)||1;
+  const customer = document.getElementById('sCustomer').value.trim() || 'Walk-in';
+  const p = products.find(x=>x.id===pid);
+  if(!p){ showToast('Add a product first'); return; }
+  const amount = p.price*qty;
+  sales.unshift({id:'s'+Date.now(), pid, name:p.name, qty, amount, customer, date:new Date().toLocaleDateString('en-NG')});
+  p.stock = Math.max(0, p.stock-qty);
+  persist(); renderSales(); closeSaleForm();
+  document.getElementById('sCustomer').value='';
+  showToast('Sale logged');
+}
+function renderSales(){
+  const tbody = document.getElementById('salesTable');
+  document.getElementById('salesEmpty').style.display = sales.length?'none':'block';
+  tbody.innerHTML = sales.map(s=>`
+    <tr><td class="mono" style="font-size:.78rem;">${s.date}</td><td>${s.name}</td><td>${s.customer}</td><td>${s.qty}</td><td class="mono">${fmt(s.amount)}</td>
+    <td><button class="btn-danger" onclick="removeSale('${s.id}')">Delete</button></td></tr>
+  `).join('');
+}
+function removeSale(id){ sales = sales.filter(s=>s.id!==id); persist(); renderSales(); }
+
+/* ===================== INQUIRIES ===================== */
+const SAMPLE_NAMES = ['Bisi K.','Emeka T.','Hassan Y.','Florence I.','Tobi A.'];
+const SAMPLE_MSGS = ['Is this still available?','Can I get a discount for bulk order?','Do you deliver outside Lagos?','What time does your shop open?','Can I pay on delivery?'];
+function simulateInquiry(){
+  inquiries.unshift({id:'i'+Date.now(), name:SAMPLE_NAMES[Math.floor(Math.random()*SAMPLE_NAMES.length)], msg:SAMPLE_MSGS[Math.floor(Math.random()*SAMPLE_MSGS.length)], date:'Today', replied:false});
+  persist(); renderInquiries();
+  showToast('New inquiry received');
+}
+function renderInquiries(){
+  const wrap = document.getElementById('inquiriesList');
+  wrap.innerHTML = inquiries.length ? inquiries.map(i=>`
+    <div class="inquiry">
+      <div><div class="iq-name">${i.name}</div><div class="iq-msg">${i.msg}</div><div class="iq-meta">${i.date}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+        <span class="tag ${i.replied?'tag-green':'tag-amber'}">${i.replied?'Replied':'New'}</span>
+        ${!i.replied?`<button class="btn-sm btn-ghost" onclick="markReplied('${i.id}')">Mark replied</button>`:''}
+      </div>
+    </div>
+  `).join('') : `<div class="empty-state">No inquiries yet.</div>`;
+}
+function markReplied(id){ const i = inquiries.find(x=>x.id===id); if(i) i.replied = true; persist(); renderInquiries(); }
+
+/* ===================== INVOICES ===================== */
+function openInvoiceForm(){ document.getElementById('invoiceFormPanel').style.display='block'; }
+function closeInvoiceForm(){ document.getElementById('invoiceFormPanel').style.display='none'; }
+function createInvoice(){
+  const customer = document.getElementById('invCustomer').value.trim();
+  const item = document.getElementById('invItem').value.trim();
+  const amount = parseFloat(document.getElementById('invAmount').value);
+  if(!customer || !item || !amount){ showToast('Fill in all invoice fields'); return; }
+  const inv = {id:'INV-'+Math.floor(1000+Math.random()*9000), customer, item, amount, status:'Unpaid', date:new Date().toLocaleDateString('en-NG')};
+  invoices.unshift(inv);
+  persist(); renderInvoices(); closeInvoiceForm();
+  document.getElementById('invCustomer').value=''; document.getElementById('invItem').value=''; document.getElementById('invAmount').value='';
+  showToast('Invoice generated');
+  previewInvoice(inv.id);
+}
+function togglePaid(id){
+  const inv = invoices.find(i=>i.id===id);
+  if(inv){ inv.status = inv.status==='Unpaid' ? 'Paid' : 'Unpaid'; persist(); renderInvoices(); }
+}
+function renderInvoices(){
+  const tbody = document.getElementById('invoiceTable');
+  document.getElementById('invoiceEmpty').style.display = invoices.length?'none':'block';
+  tbody.innerHTML = invoices.map(i=>`
+    <tr>
+      <td class="mono">${i.id}</td><td>${i.customer}</td><td class="mono">${fmt(i.amount)}</td>
+      <td><span class="tag ${i.status==='Paid'?'tag-green':'tag-amber'}">${i.status}</span></td>
+      <td><button class="btn-sm btn-ghost" onclick="previewInvoice('${i.id}')">View</button> <button class="btn-sm btn-ghost" onclick="togglePaid('${i.id}')">Toggle paid</button></td>
+    </tr>
+  `).join('');
+}
+function previewInvoice(id){
+  const inv = invoices.find(i=>i.id===id);
+  if(!inv) return;
+  document.getElementById('invoicePreviewWrap').innerHTML = `
+    <div class="invoice-paper">
+      <div class="inv-head"><div><h2>${store.name||'Your Business'}</h2><div style="font-size:.78rem; opacity:.6;">${store.whatsapp?('+234 '+store.whatsapp.replace(/^0/,'')):''}</div></div>
+        <div class="inv-no">INVOICE<br>${inv.id}</div></div>
+      <div class="invoice-meta"><div><b>Billed to:</b><br>${inv.customer}</div><div style="text-align:right;"><b>Date:</b><br>${inv.date}</div></div>
+      <table><thead><tr><th>Description</th><th style="text-align:right;">Amount</th></tr></thead>
+        <tbody><tr><td>${inv.item}</td><td class="mono" style="text-align:right;">${fmt(inv.amount)}</td></tr></tbody></table>
+      <div class="inv-total">${fmt(inv.amount)}</div>
+      <p style="font-size:.74rem; opacity:.5; margin-top:18px;">Status: ${inv.status}. Thank you for your business.</p>
+      <button class="btn btn-ghost" onclick="window.print()" style="margin-top:10px;">Print / Save as PDF</button>
+    </div>
+  `;
+}
+
+/* ===================== PLANS ===================== */
+function setPlan(p){
+  store.plan = p; persist();
+  showToast(`Switched to ${p} plan`);
+  document.getElementById('adSlot').textContent = p==='Premium'
+    ? `★ Featured: ${store.name||'Your business'} — ${store.tagline||'your tagline here'}`
+    : 'Upgrade to Premium Listing to activate your ad slot here.';
+  markCurrentPlan();
+}
+function markCurrentPlan(){
+  document.querySelectorAll('.plan-card .current-tag').forEach(t=>t.remove());
+  const map = {Free:'planFree', Pro:'planPro', Premium:'planPremium'};
+  const el = document.getElementById(map[store.plan]);
+  if(el){ const tag = document.createElement('div'); tag.className='current-tag'; tag.textContent='Current plan'; el.appendChild(tag); }
+}
+
+/* ===================== INIT ===================== */
+renderDashboard();
+markCurrentPlan();
+if(store.plan==='Premium') document.getElementById('adSlot').textContent = `★ Featured: ${store.name} — ${store.tagline}`;
+</script>
+</body>
+</html>
